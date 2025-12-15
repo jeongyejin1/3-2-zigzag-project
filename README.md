@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛍️ 지그재그(Zigzag) 쇼핑몰 리뷰 데이터 기반 <br> 감성 분석 및 토픽 모델링
+# 지그재그(Zigzag) 쇼핑몰 리뷰 데이터 기반 <br> 감성 분석 및 토픽 모델링
 
 <img src="https://img.shields.io/badge/Python-3.8%2B-blue?style=flat-square&logo=python&logoColor=white"/>
 <img src="https://img.shields.io/badge/Library-Kiwi--Piepy-green?style=flat-square"/>
@@ -95,7 +95,78 @@
 
 이 과정을 통해 모델은 긍정과 부정의 특징을 공평하게 학습할 수 있는 환경을 갖추게 되었습니다.
 
-## 5. 브랜드별 토픽 모델링 분석 결과
+## 5. 모델 학습 및 성능 평가
+
+### 5.1. 모델 및 토큰화
+
+본 프로젝트에서는 한국어 자연어 처리 태스크에서 우수한 성능을 입증한 **KoELECTRA(monologg/koelectra-base-v3-discriminator)** 모델을 감성 분석을 위한 Backbone으로 채택했다. 리뷰 텍스트는 KoELECTRA의 `ElectraTokenizer`를 통해 모델이 이해할 수 있는 토큰 시퀀스로 변환되며, 리뷰 데이터의 평균 길이를 고려하여 입력 길이는 `max_length=128`로 최적화하여 설정하였다.
+
+### 5.2. 학습 파라미터
+
+안정적인 학습 수렴과 과적합 방지를 위해 다음과 같은 하이퍼파라미터를 적용하였다.
+
+<div align="center">
+
+| 항목 | 값 및 설명 |
+|---|---|
+| **Batch Size** | 32 |
+| **Optimizer** | AdamW (learning_rate=5e-5, eps=1e-8) |
+| **Epochs** | 4 |
+| **Scheduler** | get_linear_schedule_with_warmup |
+
+<details>
+<summary><strong>👉 파라미터 선정 근거 (클릭하여 펼치기)</strong></summary>
+<div markdown="1">
+
+> 본 프로젝트의 학습 파라미터 설정은 Transformer 기반 모델의 파인튜닝에 대한 표준 가이드라인을 제시한 <br>[**BERT 논문 (Devlin et al., 2018)**](https://arxiv.org/abs/1810.04805)의 권장 사항을 기반으로 작성되었다.
+> <br><br>
+> 해당 논문의 *Appendix A.3 Fine-tuning Hyperparameters*에서는 대부분의 NLP 태스크에 대해 **Batch Size(16, 32)** 와 **Epochs(2, 3, 4)** 를 최적의 범위로 제안하고 있다. <br><br>
+> 따라서 본 프로젝트는 이를 따르되, 데이터셋의 규모를 고려하여 **Learning Rate를 5e-5**로 설정하고 Linear Warmup Scheduler를 결합하는 전략을 취했다.<br><br>
+> 이는 학습 초기의 손실(Loss) 발산을 막고 모델이 최적점(Global Optima)에 안정적으로 도달하도록 돕기 위함이며, 최종적으로 **93.50%** 라는 매우 높은 검증 정확도를 달성함으로써 그 유효성이 입증되었다.
+> <br><br>
+> *Reference: Devlin, J., Chang, M. W., Lee, K., & Toutanova, K. (2018). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. arXiv preprint arXiv:1810.04805.*
+
+</div>
+</details>
+
+</div>
+
+### 5.3. 데이터셋 구성 및 학습 결과
+
+#### 5.3.1. 학습 데이터셋 구성 (Balanced Data)
+
+모델의 편향(Bias)을 방지하기 위해 긍정과 부정 리뷰의 비율을 **1:1로 완벽하게 밸런싱(Balancing)**한 정제된 데이터셋을 구축하여 학습에 활용하였다.
+
+* **총 데이터 개수:** 3,596개
+* **구성:** 긍정 1,798개 / 부정 1,798개
+* **검증 비율:** 전체의 20%를 검증(Validation) 데이터로 분리하여 평가
+
+#### 5.3.2. 최종 학습 결과
+
+총 4 Epoch 동안 학습을 진행한 결과, **Train Loss(학습 손실률)**은 초기 0.49에서 **0.07**까지 급격히 감소하였으며, **검증 정확도(Validation Accuracy)**는 최고 **93.50%**를 기록하였다.
+
+<div align="center">
+
+| Epoch | Train Loss | Validation Accuracy | 비고 |
+|:---:|:---:|:---:|:---:|
+| 1 | 0.4939 | 89.72% | 초기 수렴 속도 우수 |
+| 2 | 0.1970 | 92.64% | 90% 정확도 돌파 |
+| 3 | 0.1150 | 91.95% | 학습 안정화 |
+| **4** | **0.0720** | **93.50%** | **최종 최고 성능 달성** |
+
+</div>
+
+<br>
+
+<div align="center">
+  <img src="pic/real_training_result.png" alt="Training Result Graph" width="90%"/>
+</div>
+
+### 5.4. 결론 
+
+데이터의 노이즈를 제거하고 클래스 균형을 맞춘 고품질 데이터셋을 사용한 결과, **93.5%** 라는 상용화 가능한 수준의 높은 정확도를 확보할 수 있었다. 이는 단순한 모델 튜닝보다 **'데이터 품질(Data Quality)'**이 감성 분석 성능에 결정적인 영향을 미침을 시사한다. 확보된 고성능 모델은 이후 진행될 토픽 모델링 및 키워드 추출 과정의 신뢰도를 보장하는 핵심 기반이 되었다.
+
+## 6. 브랜드별 토픽 모델링 분석 결과
 
 각 쇼핑몰의 **긍정 리뷰(Label 1)**와 **부정 리뷰(Label 0)** 데이터를 분리하여 LDA 분석을 수행하고, 워드클라우드로 시각화하였다.
 
