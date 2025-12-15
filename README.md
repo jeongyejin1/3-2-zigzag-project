@@ -55,10 +55,6 @@
 
 ---
 
-## 4. 데이터 전처리 및 기술적 개선
-
-### 4.1. 형태소 분석기 교체 (Okt → Kiwi)
-
 ## 4. 데이터 수집 및 전처리
 
 ### 4.1. 리뷰 데이터 수집 및 불균형 문제 인식
@@ -69,7 +65,7 @@
 * **별점 분포:** 5점 리뷰가 전체의 약 84%(19,222건)를 차지하며, 1~2점대의 부정 리뷰는 극소수에 불과함.
 
 <div align="center">
-  <img src="total_rating_distribution.png" width="600" alt="전체 평점별 리뷰 분포"/>
+  <img src="pic/total_rating_distribution.png" width="600" alt="전체 평점별 리뷰 분포"/>
   <p><i>[그림 1] 수집된 원시 데이터의 평점별 분포 (5점에 편중됨)</i></p>
 </div>
 
@@ -92,7 +88,7 @@
 * **최종 구성:** 부정 리뷰(1,798개)와 긍정 리뷰(1,798개)를 동수로 맞춰 총 **3,596개**의 고품질 학습 데이터셋을 구축하였습니다.
 
 <div align="center">
-  <img src="label_distribution.png" width="600" alt="최종 데이터셋 라벨 분포"/>
+  <img src="pic/label_distribution.png" width="600" alt="최종 데이터셋 라벨 분포"/>
   <p><i>[그림 2] 밸런싱 작업이 완료된 최종 학습 데이터셋 (부정:긍정 = 50:50)</i></p>
 </div>
 
