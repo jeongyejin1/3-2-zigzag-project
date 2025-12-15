@@ -114,20 +114,6 @@
 | **Epochs** | 4 |
 | **Scheduler** | get_linear_schedule_with_warmup |
 
-<details>
-<summary><strong>👉 파라미터 선정 근거 (클릭하여 펼치기)</strong></summary>
-<div markdown="1">
-
-> 본 프로젝트의 학습 파라미터 설정은 Transformer 기반 모델의 파인튜닝에 대한 표준 가이드라인을 제시한 <br>[**BERT 논문 (Devlin et al., 2018)**](https://arxiv.org/abs/1810.04805)의 권장 사항을 기반으로 작성되었다.
-> <br><br>
-> 해당 논문의 *Appendix A.3 Fine-tuning Hyperparameters*에서는 대부분의 NLP 태스크에 대해 **Batch Size(16, 32)** 와 **Epochs(2, 3, 4)** 를 최적의 범위로 제안하고 있다. <br><br>
-> 따라서 본 프로젝트는 이를 따르되, 데이터셋의 규모를 고려하여 **Learning Rate를 5e-5**로 설정하고 Linear Warmup Scheduler를 결합하는 전략을 취했다.<br><br>
-> 이는 학습 초기의 손실(Loss) 발산을 막고 모델이 최적점(Global Optima)에 안정적으로 도달하도록 돕기 위함이며, 최종적으로 **93.50%** 라는 매우 높은 검증 정확도를 달성함으로써 그 유효성이 입증되었다.
-> <br><br>
-> *Reference: Devlin, J., Chang, M. W., Lee, K., & Toutanova, K. (2018). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. arXiv preprint arXiv:1810.04805.*
-
-</div>
-</details>
 
 </div>
 
@@ -159,7 +145,7 @@
 <br>
 
 <div align="center">
-  <img src="pic/real_training_result.png" alt="Training Result Graph" width="90%"/>
+  <img src="pic/real_training_result.png"  width="90%"/>
 </div>
 
 ### 5.4. 결론 
